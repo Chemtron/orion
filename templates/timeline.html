@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Intel Timeline{% endblock %}
+{% block nav_timeline %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/timeline.css">{% endblock %}
+
+{% block body %}
+  <main class="main timeline-main">
+    <div class="card-header mb-16">
+      <span class="card-title">Intel Timeline</span>
+      <button type="button" class="btn" onclick="ackAllEvents()">Acknowledge All</button>
+    </div>
+
+    <div class="timeline-filters">
+      <button type="button" class="filter-btn active" onclick="filterTimeline('all', this)">All</button>
+      <button type="button" class="filter-btn" onclick="filterTimeline('critical', this)">Critical</button>
+      <button type="button" class="filter-btn" onclick="filterTimeline('high', this)">High</button>
+      <button type="button" class="filter-btn" onclick="filterTimeline('medium', this)">Medium</button>
+      <button type="button" class="filter-btn" onclick="filterTimeline('info', this)">Info</button>
+    </div>
+
+    <div id="timeline-list" class="timeline-list"></div>
+  </main>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/timeline.js"></script>{% endblock %}

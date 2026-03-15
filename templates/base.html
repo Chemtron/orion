@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORION — {% block title %}Signal Intelligence{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/base.css?v=2">
+  {% block css %}{% endblock %}
+</head>
+<body>
+  <nav class="nav" aria-label="Main navigation">
+    <a href="/" class="nav-brand">ORI<span>ON</span></a>
+    <a href="/hud" class="nav-link {% block nav_hud %}{% endblock %}">HUD</a>
+    <a href="/timeline" class="nav-link {% block nav_timeline %}{% endblock %}">Timeline</a>
+    <a href="/devices" class="nav-link {% block nav_devices %}{% endblock %}">Devices</a>
+    <a href="/enrichment" class="nav-link {% block nav_enrichment %}{% endblock %}">Intel</a>
+    <a href="/debrief" class="nav-link {% block nav_debrief %}{% endblock %}">Debrief</a>
+    <a href="/alerts" class="nav-link {% block nav_alerts %}{% endblock %}">Alerts</a>
+    <a href="/settings" class="nav-link {% block nav_settings %}{% endblock %}">Config</a>
+    <div class="nav-status">
+      <span class="status-dot" id="scan-indicator"></span>
+      <span class="stat-chip">WiFi <span id="wifi-count">—</span></span>
+      <span class="stat-chip">BLE <span id="ble-count">—</span></span>
+      <span class="stat-chip">Net <span id="net-count">—</span></span>
+    </div>
+  </nav>
+
+  <div id="alert-container"></div>
+
+  {% block body %}{% endblock %}
+
+  <script src="/static/js/utils.js"></script>
+  <script src="/static/js/api.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

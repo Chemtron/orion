@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Device Inventory{% endblock %}
+{% block nav_devices %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/devices.css">{% endblock %}
+
+{% block body %}
+  <main class="main devices-main">
+    <div class="devices-toolbar">
+      <input type="text" class="search-input" id="device-search" placeholder="Search MAC, SSID, vendor..." oninput="filterDevices()">
+      <div class="type-tabs">
+        <button type="button" class="type-tab active" onclick="setTypeFilter('all', this)">All</button>
+        <button type="button" class="type-tab" onclick="setTypeFilter('wifi', this)">WiFi</button>
+        <button type="button" class="type-tab" onclick="setTypeFilter('ble', this)">BLE</button>
+        <button type="button" class="type-tab" onclick="setTypeFilter('network', this)">Network</button>
+      </div>
+      <span class="devices-count" id="device-count">0 devices</span>
+    </div>
+
+    <div class="device-table-container">
+      <table class="data-table" id="device-table">
+        <thead>
+          <tr>
+            <th>Risk</th>
+            <th>Type</th>
+            <th>MAC</th>
+            <th>SSID / Name</th>
+            <th>Vendor</th>
+            <th>Classification</th>
+            <th>RSSI</th>
+            <th>Security</th>
+            <th>Last Seen</th>
+            <th>Scans</th>
+          </tr>
+        </thead>
+        <tbody id="device-tbody"></tbody>
+      </table>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/devices.js"></script>{% endblock %}

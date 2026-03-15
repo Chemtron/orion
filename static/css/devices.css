@@ -1,0 +1,104 @@
+/* static/css/devices.css */
+.devices-main {
+  padding: calc(var(--nav-height) + 16px) 16px 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.devices-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 7px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  width: 280px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.type-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.type-tab {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+
+.type-tab:hover, .type-tab.active {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  background: var(--accent-dim);
+}
+
+.device-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+}
+
+.device-type-cell   { text-transform: uppercase; font-size: 12px; }
+.device-class-new        { color: var(--status-new); font-size: 13px; }
+.device-class-transient  { color: var(--status-warn); font-size: 13px; }
+.device-class-static     { color: var(--status-ok); font-size: 13px; }
+.device-class-baseline   { color: var(--accent-cyan); font-size: 13px; }
+.device-class-mobile     { color: var(--status-info); font-size: 13px; }
+.device-class-recurring  { color: var(--text-secondary); font-size: 13px; }
+.device-class-unknown    { color: var(--text-muted); font-size: 13px; }
+.device-security-cell    { font-size: 13px; }
+.device-lastseen-cell    { font-size: 12px; color: var(--text-muted); }
+.device-scans-cell       { text-align: center; }
+
+.devices-count {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .devices-main {
+    padding: calc(var(--nav-height) + 8px) 8px 8px;
+  }
+  .devices-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input {
+    width: 100%;
+  }
+  .type-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .device-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .data-table {
+    min-width: 800px;
+  }
+}

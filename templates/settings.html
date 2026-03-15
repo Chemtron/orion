@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block nav_settings %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/settings.css">{% endblock %}
+
+{% block body %}
+  <main class="main settings-main">
+    <!-- Platform Info -->
+    <div class="settings-section">
+      <div class="settings-section-title">Platform</div>
+      <div class="card">
+        <span class="platform-badge" id="platform-badge">Detecting...</span>
+        <span class="dim ml-12" id="platform-info"></span>
+      </div>
+    </div>
+
+    <!-- Scanner Toggles -->
+    <div class="settings-section">
+      <div class="settings-section-title">Scanner Toggles</div>
+      <div class="settings-grid">
+        <div class="toggle-row">
+          <span class="toggle-label">WiFi Scanning</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-wifi" onchange="updateToggle('enable_wifi_scan', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">BLE Scanning</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-ble" onchange="updateToggle('enable_ble_scan', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Network Scanning</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-network" onchange="updateToggle('enable_network_scan', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Enrichment APIs</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-enrichment" onchange="updateToggle('enable_enrichment', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scan Intervals -->
+    <div class="settings-section">
+      <div class="settings-section-title">Scan Intervals</div>
+      <div class="card">
+        <div class="settings-grid">
+          <div class="form-group">
+            <label class="form-label" for="wifi-interval">WiFi Interval (seconds)</label>
+            <input type="number" class="form-input" id="wifi-interval" min="5" max="300" value="30">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ble-interval">BLE Interval (seconds)</label>
+            <input type="number" class="form-input" id="ble-interval" min="5" max="300" value="20">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="network-interval">Network Interval (seconds)</label>
+            <input type="number" class="form-input" id="network-interval" min="10" max="600" value="120">
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary mt-8" onclick="saveIntervals()">Save Intervals</button>
+      </div>
+    </div>
+
+    <!-- Enrichment Status -->
+    <div class="settings-section">
+      <div class="settings-section-title">Enrichment API Status</div>
+      <div class="card" id="enrichment-status"></div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/settings.js"></script>{% endblock %}

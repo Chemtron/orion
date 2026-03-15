@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}HUD{% endblock %}
+{% block nav_hud %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/hud.css">{% endblock %}
+
+{% block body %}
+  <main class="main hud-main">
+    <!-- Radar Panel -->
+    <div class="hud-radar-panel">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Signal Radar</span>
+          <div class="flex-row">
+            <button type="button" class="btn btn-primary" onclick="triggerScan('wifi')">Scan WiFi</button>
+            <button type="button" class="btn" onclick="triggerScan('ble')">Scan BLE</button>
+          </div>
+        </div>
+        <div class="radar-container">
+          <canvas id="radar-canvas" width="500" height="500"></canvas>
+        </div>
+        <div class="radar-legend">
+          <span class="legend-dot wifi"></span> WiFi
+          <span class="legend-dot ble"></span> BLE
+          <span class="legend-dot network"></span> Network
+          <span class="legend-dot alert"></span> Alert
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Device List -->
+    <div class="hud-side-panel">
+      <!-- Stats row -->
+      <div class="hud-stats-row">
+        <div class="hud-stat-box">
+          <div class="hud-stat-value" id="stat-total">0</div>
+          <div class="hud-stat-label">TOTAL</div>
+        </div>
+        <div class="hud-stat-box alert">
+          <div class="hud-stat-value" id="stat-alerts">0</div>
+          <div class="hud-stat-label">ALERTS</div>
+        </div>
+        <div class="hud-stat-box">
+          <div class="hud-stat-value" id="stat-new">0</div>
+          <div class="hud-stat-label">NEW</div>
+        </div>
+        <div class="hud-stat-box">
+          <div class="hud-stat-value" id="stat-static">0</div>
+          <div class="hud-stat-label">STATIC</div>
+        </div>
+      </div>
+
+      <!-- Live feed -->
+      <div class="card hud-live-card">
+        <div class="card-header">
+          <span class="card-title">Live Devices</span>
+          <span class="label" id="last-scan-time">—</span>
+        </div>
+        <div id="live-device-list" class="live-feed"></div>
+      </div>
+
+      <!-- Alert feed -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Intel</span>
+          <a href="/timeline" class="label no-decoration">View All</a>
+        </div>
+        <div id="intel-feed" class="intel-feed"></div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/radar.js"></script>
+<script src="/static/js/alerts.js"></script>
+<script src="/static/js/app.js"></script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}OSINT Enrichment{% endblock %}
+{% block nav_enrichment %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/enrichment.css">{% endblock %}
+
+{% block body %}
+  <main class="main enrichment-main">
+    <div class="card-header mb-16">
+      <span class="card-title">OSINT Enrichment</span>
+    </div>
+
+    <div class="enrich-grid">
+      <!-- OUI Lookup -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">OUI / Vendor Lookup</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="oui-mac">MAC Address</label>
+          <input type="text" class="form-input" id="oui-mac" placeholder="AA:BB:CC:DD:EE:FF">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="lookupOUI()">Lookup</button>
+        <div class="enrich-result hidden" id="oui-result"></div>
+      </div>
+
+      <!-- SSID Analyzer -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">SSID Analyzer</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ssid-input">SSID Name</label>
+          <input type="text" class="form-input" id="ssid-input" placeholder="Enter SSID...">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="analyzeSSID()">Analyze</button>
+        <div class="enrich-result hidden" id="ssid-result"></div>
+      </div>
+
+      <!-- WiGLE Lookup -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">WiGLE Geolocation</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="wigle-bssid">BSSID</label>
+          <input type="text" class="form-input" id="wigle-bssid" placeholder="AA:BB:CC:DD:EE:FF">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="lookupWiGLE()">Search WiGLE</button>
+        <div class="enrich-result hidden" id="wigle-result"></div>
+      </div>
+
+      <!-- CVE Lookup -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">CVE / Vulnerability Lookup</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cve-vendor">Vendor Name</label>
+          <input type="text" class="form-input" id="cve-vendor" placeholder="e.g. Hikvision">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="lookupCVE()">Search NVD</button>
+        <div class="enrich-result hidden" id="cve-result"></div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/enrichment.js"></script>{% endblock %}

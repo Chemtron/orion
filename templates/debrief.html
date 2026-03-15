@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Debrief{% endblock %}
+{% block nav_debrief %}active{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/enrichment.css">{% endblock %}
+
+{% block body %}
+  <main class="main enrichment-main">
+    <div class="card-header mb-16">
+      <span class="card-title">Signal Intelligence Debrief</span>
+      <div class="flex-row">
+        <select class="form-select w-120" id="debrief-window">
+          <option value="5">5 minutes</option>
+          <option value="15">15 minutes</option>
+          <option value="30">30 minutes</option>
+          <option value="60">60 minutes</option>
+        </select>
+        <button type="button" class="btn btn-primary" onclick="generateDebrief()">Generate</button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="enrich-grid">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Summary</span></div>
+        <div id="debrief-summary"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Active Alerts</span></div>
+        <div id="debrief-alerts"></div>
+      </div>
+    </div>
+
+    <!-- High Risk Devices -->
+    <div class="card mt-12">
+      <div class="card-header"><span class="card-title">High Risk Devices</span></div>
+      <div id="debrief-highrisk"></div>
+    </div>
+
+    <!-- AI Prompt -->
+    <div class="card mt-12">
+      <div class="card-header">
+        <span class="card-title">AI Analysis Prompt</span>
+        <button type="button" class="btn" onclick="copyPrompt()">Copy to Clipboard</button>
+      </div>
+      <div class="enrich-result block" id="debrief-prompt"></div>
+    </div>
+
+    <!-- Raw JSON -->
+    <div class="card mt-12">
+      <div class="card-header">
+        <span class="card-title">Raw JSON Export</span>
+        <button type="button" class="btn" onclick="exportJSON()">Download JSON</button>
+      </div>
+      <div class="enrich-result hidden" id="debrief-json"></div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  'use strict';
+  let debriefData = null;
+
+  async function generateDebrief() {
+    const debriefWindow = document.getElementById('debrief-window').value;
+    debriefData = await OrionAPI.getDebrief(debriefWindow);
+
+    // Summary
+    const s = debriefData.summary;
+    document.getElementById('debrief-summary').innerHTML = `
+      <div class="enrich-field"><span class="enrich-field-label">WiFi Devices</span><span class="enrich-field-value">${s.total_wifi}</span></div>
+      <div class="enrich-field"><span class="enrich-field-label">BLE Devices</span><span class="enrich-field-value">${s.total_ble}</span></div>
+      <div class="enrich-field"><span class="enrich-field-label">Network Devices</span><span class="enrich-field-value">${s.total_network}</span></div>
+      <div class="enrich-field"><span class="enrich-field-label">High Risk</span><span class="enrich-field-value color-alert">${s.high_risk_count}</span></div>
+      <div class="enrich-field"><span class="enrich-field-label">New Devices</span><span class="enrich-field-value color-new">${s.new_device_count}</span></div>
+      <div class="enrich-field"><span class="enrich-field-label">Active Alerts</span><span class="enrich-field-value">${s.active_alerts}</span></div>
+    `;
+
+    // Alerts
+    const alerts = debriefData.active_alerts || [];
+    document.getElementById('debrief-alerts').innerHTML = alerts.length
+      ? alerts.map(a => `<div class="debrief-alert-item">
+          <span class="debrief-alert-sev">[${escHtml(a.severity)}]</span>
+          ${escHtml(a.title)}
+        </div>`).join('')
+      : '<div class="dim py-8">No active alerts</div>';
+
+    // High risk
+    const hr = debriefData.high_risk_devices || [];
+    document.getElementById('debrief-highrisk').innerHTML = hr.length
+      ? `<table class="data-table"><thead><tr><th>Score</th><th>Type</th><th>MAC</th><th>SSID</th><th>Vendor</th><th>Flags</th></tr></thead><tbody>`
+        + hr.map(d => `<tr>
+            <td><span class="risk-badge ${d.risk_score >= 70 ? 'risk-critical' : 'risk-high'}">${d.risk_score}</span></td>
+            <td>${escHtml(d.type)}</td>
+            <td class="mac-cell">${escHtml(d.mac)}</td>
+            <td>${escHtml(d.ssid || '')}</td>
+            <td class="vendor-cell">${escHtml(d.vendor)}</td>
+            <td class="debrief-flags-cell">${escHtml((d.flags || []).join(', '))}</td>
+          </tr>`).join('')
+        + `</tbody></table>`
+      : '<div class="dim py-8">No high-risk devices</div>';
+
+    // AI Prompt
+    document.getElementById('debrief-prompt').innerHTML = `<pre>${escHtml(debriefData.ai_prompt || '')}</pre>`;
+
+    // JSON
+    document.getElementById('debrief-json').innerHTML = `<pre>${escHtml(JSON.stringify(debriefData, null, 2))}</pre>`;
+  }
+
+  function copyPrompt() {
+    if (debriefData && debriefData.ai_prompt) {
+      navigator.clipboard.writeText(debriefData.ai_prompt);
+    }
+  }
+
+  function exportJSON() {
+    if (!debriefData) return;
+    const blob = new Blob([JSON.stringify(debriefData, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orion_debrief_${new Date().toISOString().slice(0,16)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener('DOMContentLoaded', generateDebrief);
+</script>
+{% endblock %}

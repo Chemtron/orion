@@ -1,0 +1,10 @@
+netgear
+linksys
+tp-link
+tplink
+fritz
+xfinity
+spectrum
+att-
+default
+dlink

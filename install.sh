@@ -41,8 +41,13 @@ fi
 # Install Python dependencies
 echo "[+] Installing Python dependencies..."
 cd "$ORION_DIR"
-$PIP_CMD install --break-system-packages -r requirements.txt 2>/dev/null || \
-$PIP_CMD install -r requirements.txt
+if [ "$PLATFORM" == "termux" ]; then
+  $PIP_CMD install --break-system-packages -r requirements-termux.txt 2>/dev/null || \
+  $PIP_CMD install -r requirements-termux.txt
+else
+  $PIP_CMD install --break-system-packages -r requirements.txt 2>/dev/null || \
+  $PIP_CMD install -r requirements.txt
+fi
 
 # Create data directories
 mkdir -p "$ORION_DIR/data/logs"

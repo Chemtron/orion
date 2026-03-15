@@ -38,15 +38,37 @@ class WiFiScanner:
 
     def _scan_termux(self) -> List[Dict]:
         try:
-            result = subprocess.run(
-                ['termux-wifi-scaninfo'],
-                capture_output=True, text=True, timeout=10
+            # Start the API service first
+            subprocess.run(
+                ['termux-api-start'],
+                capture_output=True, timeout=5
             )
-            raw = json.loads(result.stdout)
-            return [self._normalize_termux(ap) for ap in raw]
-        except Exception as e:
-            logger.warning("WiFi Termux scan error: %s", e)
-            return []
+        except Exception:
+            pass  # Continue even if this fails
+
+        for attempt in range(2):
+            try:
+                result = subprocess.run(
+                    ['termux-wifi-scaninfo'],
+                    capture_output=True, text=True, timeout=25
+                )
+                if result.stdout.strip():
+                    raw = json.loads(result.stdout)
+                    return [self._normalize_termux(ap) for ap in raw]
+                elif attempt == 0:
+                    import time
+                    time.sleep(3)
+            except subprocess.TimeoutExpired:
+                logger.warning("WiFi Termux scan timed out (attempt %d)", attempt + 1)
+                if attempt == 0:
+                    import time
+                    time.sleep(3)
+                    continue
+                return []
+            except Exception as e:
+                logger.warning("WiFi Termux scan error: %s", e)
+                return []
+        return []
 
     def _normalize_termux(self, ap: dict) -> dict:
         rssi = ap.get('rssi', -100)

@@ -114,6 +114,8 @@ class ScannerManager:
                 self.db.upsert_device(mac, 'ble', device)
                 self.db.log_scan_event('ble', mac, device)
                 self.alert_manager.evaluate_ble(device)
+            if not devices:
+                logger.info("BLE scan returned 0 devices — scanner may not be available on this platform")
             with self._lock:
                 self._last_ble_results = devices
         except Exception as e:

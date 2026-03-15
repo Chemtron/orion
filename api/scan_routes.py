@@ -54,5 +54,67 @@ def trigger_network():
         return jsonify({'error': 'Internal server error'}), 500
 
 
+@scan_bp.route('/diagnostics', methods=['GET'])
+def diagnostics():
+    import subprocess as _sp
+    try:
+        config = current_app.config['ORION_CONFIG']
+
+        results = {
+            'platform': config.platform,
+            'checks': {}
+        }
+
+        # Check termux-wifi-scaninfo
+        try:
+            _sp.run(['termux-wifi-scaninfo'], capture_output=True, timeout=3)
+            results['checks']['termux_wifi'] = 'available'
+        except FileNotFoundError:
+            results['checks']['termux_wifi'] = 'not_found'
+        except _sp.TimeoutExpired:
+            results['checks']['termux_wifi'] = 'timeout'
+        except Exception as e:
+            results['checks']['termux_wifi'] = str(e)
+
+        # Check termux-api-start
+        try:
+            _sp.run(['termux-api-start'], capture_output=True, timeout=3)
+            results['checks']['termux_api'] = 'available'
+        except FileNotFoundError:
+            results['checks']['termux_api'] = 'not_found'
+        except Exception as e:
+            results['checks']['termux_api'] = str(e)
+
+        # Check nmap
+        try:
+            _sp.run(['nmap', '--version'], capture_output=True, timeout=5)
+            results['checks']['nmap'] = 'available'
+        except FileNotFoundError:
+            results['checks']['nmap'] = 'not_found'
+        except Exception as e:
+            results['checks']['nmap'] = str(e)
+
+        # Check bleak
+        try:
+            import bleak
+            results['checks']['bleak'] = 'available'
+        except ImportError:
+            results['checks']['bleak'] = 'not_installed'
+
+        # Check bluetoothctl
+        try:
+            _sp.run(['bluetoothctl', '--version'], capture_output=True, timeout=3)
+            results['checks']['bluetoothctl'] = 'available'
+        except FileNotFoundError:
+            results['checks']['bluetoothctl'] = 'not_found'
+        except Exception as e:
+            results['checks']['bluetoothctl'] = str(e)
+
+        return jsonify(results)
+    except Exception as e:
+        logger.exception("Error running diagnostics")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
 if __name__ == '__main__':
     print("scan_routes module loaded")

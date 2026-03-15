@@ -37,41 +37,22 @@ class BLEScanner:
             return self._scan_mock_ble()
 
     def _scan_termux(self) -> List[Dict]:
+        # Try bleak first (works on some Android/Termux setups)
         try:
-            result = subprocess.run(
-                ['termux-bluetooth-scaninfo'],
-                capture_output=True, text=True, timeout=5
-            )
-            if result.returncode == 0 and result.stdout.strip():
-                raw = json.loads(result.stdout)
-                return [self._normalize_ble_device(d) for d in raw]
+            import bleak
+            import asyncio
+            loop = asyncio.new_event_loop()
+            devices = loop.run_until_complete(self._bleak_scan(timeout=5.0))
+            loop.close()
+            if devices:
+                return devices
         except Exception as e:
-            logger.warning("BLE Termux API scan error: %s", e)
+            logger.info("BLE bleak not available on Termux: %s", e)
 
-        proc = None
-        try:
-            proc = subprocess.Popen(
-                ['bluetoothctl'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            commands = "scan on\n"
-            import time
-            time.sleep(5)
-            commands += "devices\nscan off\nexit\n"
-            stdout, _ = proc.communicate(input=commands, timeout=10)
-            return self._parse_bluetoothctl_output(stdout)
-        except Exception as e:
-            logger.warning("BLE Termux bluetoothctl scan error: %s", e)
-            if proc is not None:
-                try:
-                    proc.kill()
-                    proc.wait()
-                except OSError:
-                    pass
-            return []
+        # BLE not available on this Termux setup - return empty gracefully
+        # User will see 0 BLE devices which is correct behavior
+        logger.info("BLE scanning not available on Termux — returning empty")
+        return []
 
     def _scan_linux(self) -> List[Dict]:
         try:
@@ -79,6 +60,9 @@ class BLEScanner:
             devices = asyncio.run(self._bleak_scan())
             return devices
         except ImportError:
+            return self._bluetoothctl_scan()
+        except Exception as e:
+            logger.warning("BLE Linux bleak scan error: %s", e)
             return self._bluetoothctl_scan()
 
     async def _bleak_scan(self, timeout: float = 5.0) -> List[Dict]:
@@ -123,6 +107,9 @@ class BLEScanner:
             time.sleep(5)
             stdout, _ = proc.communicate(input="scan on\ndevices\nscan off\nexit\n", timeout=10)
             return self._parse_bluetoothctl_output(stdout)
+        except FileNotFoundError:
+            logger.warning("bluetoothctl not found — BLE scanning unavailable on this platform")
+            return []
         except Exception as e:
             logger.warning("BLE bluetoothctl scan error: %s", e)
             if proc is not None:
